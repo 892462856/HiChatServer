@@ -12,7 +12,7 @@ const sequelize = new Sequelize('HiChat', 'sa', '123456', {
   storage: 'C:/Projects/HichatServerDatabase/HiChat.sqlite' // 仅 SQLite 适用
 })
 
-exports.create = function ()
+exports.create = function (force)
 {
   const User = sequelize.define('User', {
     id: {
@@ -172,11 +172,11 @@ exports.create = function ()
   // User.hasMany(GroupMember, { as: 'groups' })
 
 
-  User.sync({ force: true })
-  Friend.sync({ force: true })
-  Group.sync({ force: true })
-  GroupMember.sync({ force: true })
-  Message.sync({ force: true })
+  User.sync({ force })
+  Friend.sync({ force })
+  Group.sync({ force })
+  GroupMember.sync({ force })
+  Message.sync({ force })
 
   // User.sync({ force: false }).then(function ()
   // {
@@ -273,7 +273,7 @@ class FriendOperation // extends BaseOperation
       {
         if (!created)
         {
-          throw new Error(`friend existed.`)
+          throw new Error('friend existed.')
         }
         return this.get(usrId, friendId)
       })
@@ -328,6 +328,14 @@ class GroupMemberOperation // extends BaseOperation
   {
     return this.model.findAll({ where: { groupId }, include: { model: models.User, as: 'user' } })
   }
+  getSimpleList (groupId)
+  {
+    return this.model.findAll({ where: { groupId } })
+  }
+  getSimpleListBy (userId)
+  {
+    return this.model.findAll({ where: { userId } })
+  }
   add (groupId, userId, isOwner = false, isAdmin = false)
   {
     return this.model.findOrCreate({ where: { groupId, userId }, defaults: { groupId, userId, isOwner, isAdmin } })
@@ -335,7 +343,7 @@ class GroupMemberOperation // extends BaseOperation
       {
         if (!created)
         {
-          throw new Error(`member existed.`)
+          throw new Error('member existed.')
         }
         return this.get(groupId, userId)
       })
@@ -377,13 +385,13 @@ class FriendMessageOperation extends BaseOperation
       }
     })
   }
-  updateReceiveTime (ids)
+  updateReceiveTime (id)
   {
-    return this.model.update({ receiveTime: Sequelize.NOW }, { where: { targetType: 'friend', id: { [Op.in]: ids } } })
-    // return this.get(id).then(m =>
-    // {
-    //   return m.update({ receiveTime: Sequelize.NOW, })
-    // })
+    // return this.model.update({ receiveTime: Sequelize.NOW }, { where: { targetType: 'friend', id: { [Op.in]: ids } } })
+    return this.get(id).then(m =>
+    {
+      return m.update({ receiveTime: Sequelize.NOW, })
+    })
   }
   updateReadTime (id)
   {
@@ -435,7 +443,8 @@ class GroupMessageOperation extends BaseOperation
             sentTime: { [Op.gte]: userUnreadTime }
           }
         })
-      } else
+      }
+      else
       {
         return []
       }
