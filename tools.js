@@ -2,7 +2,7 @@ exports.uuid = function uuid ()
 {
   const s = []
   const hexDigits = '0123456789abcdef'
-  for (const i = 0; i < 36; i++)
+  for (let i = 0; i < 36; i++)
   {
     s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1)
   }
@@ -12,4 +12,10 @@ exports.uuid = function uuid ()
 
   const uuid = s.join('')
   return uuid
+}
+exports.customError = function (code, message)
+{
+  const error = new Error(message)
+  error.code = code
+  return error
 }

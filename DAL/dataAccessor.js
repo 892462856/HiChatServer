@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize')
+const tools = require('../tools')
 
 const sequelize = new Sequelize('HiChat', 'sa', '123456', {
   host: 'localhost',
@@ -11,8 +12,9 @@ const sequelize = new Sequelize('HiChat', 'sa', '123456', {
 
   storage: 'C:/Projects/HichatServerDatabase/HiChat.sqlite' // 仅 SQLite 适用
 })
+const Op = Sequelize.Op
 
-exports.create = function (force)
+const create = function (force)
 {
   const User = sequelize.define('User', {
     id: {
@@ -189,9 +191,6 @@ exports.create = function (force)
 }
 // exports.models = sequelize.models
 
-const models = sequelize.models
-const Op = Sequelize.Op
-
 class BaseOperation
 {
   constructor(model)
@@ -218,18 +217,19 @@ class BaseOperation
 
 class UserOperation extends BaseOperation
 {
-  constructor(model = null)
+  constructor(model)
   {
-    super(model || models.User)
+    super(model)
   }
   add (m)
   {
+    m.id = tools.uuid()
     return this.model.findOrCreate({ where: { mobile: m.mobile }, defaults: m })
       .then(([oldM, created]) =>
       {
         if (!created)
         {
-          throw new Error(`mobile:${m.mobile} existed.`)
+          throw tools.customError(505, `mobile:${m.mobile} existed.`)
         }
         return oldM
       })
@@ -254,9 +254,9 @@ class UserOperation extends BaseOperation
 
 class FriendOperation // extends BaseOperation
 {
-  constructor()
+  constructor(model)
   {
-    this.model = models.Friend
+    this.model = model
   }
   get (userId, friendId)
   {
@@ -286,9 +286,9 @@ class FriendOperation // extends BaseOperation
 
 class GroupOperation extends BaseOperation
 {
-  constructor(model = null)
+  constructor(model)
   {
-    super(model || models.Group)
+    super(model)
   }
   get (id)
   {
@@ -316,9 +316,9 @@ class GroupOperation extends BaseOperation
 
 class GroupMemberOperation // extends BaseOperation
 {
-  constructor()
+  constructor(model)
   {
-    this.model = models.GroupMember
+    this.model
   }
   get (groupId, userId)
   {
@@ -365,9 +365,9 @@ class GroupMemberOperation // extends BaseOperation
 
 class FriendMessageOperation extends BaseOperation
 {
-  constructor(model = null)
+  constructor(model)
   {
-    super(model || models.Message)
+    super(model)
   }
   add (m)
   {
@@ -404,9 +404,9 @@ class FriendMessageOperation extends BaseOperation
 
 class GroupMessageOperation extends BaseOperation
 {
-  constructor(model = null)
+  constructor(model)
   {
-    super(model || models.Message)
+    super(model)
   }
   add (props)
   {
@@ -465,9 +465,15 @@ class GroupMessageOperation extends BaseOperation
   }
 }
 
-exports.User = UserOperation
-exports.Friend = FriendOperation
-exports.Group = GroupOperation
-exports.GroupMember = GroupMemberOperation
-exports.FriendMessage = FriendMessageOperation
-exports.GroupMessage = GroupMessageOperation
+exports.create = function ()
+{
+  create()
+  return {
+    User: new UserOperation(sequelize.models.User),
+    Friend: new FriendOperation(sequelize.models.Friend),
+    Group: new GroupOperation(sequelize.models.Group),
+    GroupMember: new GroupMemberOperation(sequelize.models.GroupMember),
+    FriendMessage: new FriendMessageOperation(sequelize.models.Message),
+    GroupMessage: new GroupMessageOperation(sequelize.models.Message)
+  }
+}

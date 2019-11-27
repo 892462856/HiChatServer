@@ -1,10 +1,13 @@
 const tools = require('./tools')
 const socket = require('./socket')
 const express = require('express')
-const app = express()
+const bodyParser = require('body-parser')
 
-const dal = require('./DAL/dataAccessor')
-dal.create(false)
+const app = express()
+app.use(bodyParser.urlencoded({ extended: false })) // parse application/x-www-form-urlencoded
+app.use(bodyParser.json()) // parse application/json
+
+const dal = require('./DAL/dataAccessor').create(false)
 
 app.get('/', (req, res) =>
 {
@@ -13,6 +16,30 @@ app.get('/', (req, res) =>
   // {
   //   res.send(user.createdAt)
   // })
+})
+
+app.get('/login', (req, res) =>
+{
+  const { mobile, password } = req.body
+  dal.User.getByPWD(mobile, password).then(user =>
+  {
+    res.send(user)
+  })
+})
+app.get('/reg', (req, res, next) =>
+{
+  const { name, ico, mobile, password } = req.query
+  dal.User.add({ name, ico, mobile, password }).then(user =>
+  {
+    res.send(user)
+  }).catch(next)
+})
+
+app.use(function (error, req, res, next)
+{
+  // console.log(error.code, error.message)
+  res.status(500).send({ code: error.code, messge: error.message })
+  // next(error)
 })
 
 app.listen(3000, () =>
