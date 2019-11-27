@@ -173,23 +173,12 @@ const create = function (force)
   })
   // User.hasMany(GroupMember, { as: 'groups' })
 
-
   User.sync({ force })
   Friend.sync({ force })
   Group.sync({ force })
   GroupMember.sync({ force })
   Message.sync({ force })
-
-  // User.sync({ force: false }).then(function ()
-  // {
-  //   // 已创建数据表
-  //   return User.create({
-  //     firstName: 'John',
-  //     lastName: 'Hancock'
-  //   })
-  // })
 }
-// exports.models = sequelize.models
 
 class BaseOperation
 {
@@ -238,6 +227,10 @@ class UserOperation extends BaseOperation
   {
     return this.model.findOne({ where: { mobile, password } })
   }
+  getByMobile (mobile)
+  {
+    return this.model.findOne({ where: { mobile } })
+  }
   updateInfo (id, { name = null, password = null, mobile = null, ico = null })
   {
     return this.get(id).then(m =>
@@ -266,21 +259,22 @@ class FriendOperation // extends BaseOperation
   {
     return this.model.findAll({ where: { userId }, include: { model: models.User, as: 'friend' } })
   }
-  add (usrId, friendId)
+  add (userId, friendId)
   {
-    return this.model.findOrCreate({ where: { usrId, friendId }, defaults: { usrId, friendId, isBlacked: false } })
+    return this.model.findOrCreate({ where: { userId, friendId }, defaults: { userId, friendId, isBlacked: false } })
       .then(([oldM, created]) =>
       {
         if (!created)
         {
-          throw new Error('friend existed.')
+          throw new tools.customError(505, 'friend existed.')
         }
-        return this.get(usrId, friendId)
+        const info = this.get(userId, friendId)
+        return info.friend
       })
   }
-  updateIsBlacked (usrId, friendId, isBlacked)
+  updateIsBlacked (userId, friendId, isBlacked)
   {
-    return this.model.update({ isBlacked }, { where: { usrId, friendId } })
+    return this.model.update({ isBlacked }, { where: { userId, friendId } })
   }
 }
 
@@ -345,7 +339,7 @@ class GroupMemberOperation // extends BaseOperation
         {
           throw new Error('member existed.')
         }
-        return this.get(groupId, userId)
+        return this.get(groupId, userId).user
       })
   }
   addMulti (groupId, usersId)
@@ -357,9 +351,16 @@ class GroupMemberOperation // extends BaseOperation
       return results
     })
   }
-  delete (groupId, userId)
+  delete (groupId, usersId)
   {
-    this.model.destroy({ where: { groupId, userId, isOwner: false } }) // 不能删除群主
+    return this.getList(groupId).then(member =>
+    {
+      usersId.map(userId =>
+      {
+        this.model.destroy({ where: { groupId, userId, isOwner: false } }) // 不能删除群主
+      })
+      return member.filter(m => usersId.find(u => u.id === m.userId)).map(m => m.user)
+    })
   }
 }
 

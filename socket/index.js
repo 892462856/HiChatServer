@@ -75,3 +75,18 @@ exports.listen = listen
 exports.close = close
 exports.isExist = isExist
 exports.send = send
+exports.CreateGroupMessage = function (type, senderId, targetId, content)
+{
+  const message = {
+    id: tools.uuid(),
+    cid: tools.uuid(),
+    type,
+    senderId,
+    targetId,
+    targetType: 'group',
+    content,
+    callList: [],
+    sentTime: Sequelize.NOW
+  }
+  return message
+}
