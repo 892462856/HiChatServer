@@ -1,16 +1,17 @@
+require('./socket')
 const express = require('express')
 const app = express()
 
-const dataAccessor = require('./DAL/dataAccessor')
-dataAccessor.create()
+const dal = require('./DAL/dataAccessor')
+dal.create()
 
 app.get('/', (req, res) =>
 {
-  // res.send('Hello World!')
-  dataAccessor.models.User.findByPk(2).then(user =>
-  {
-    res.send(user.createdAt)
-  })
+  res.send('Hello World!')
+  // dal.User.get(2).then(user =>
+  // {
+  //   res.send(user.createdAt)
+  // })
 })
 
 app.listen(3000, () =>

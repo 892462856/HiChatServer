@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
+    "nodejs-websocket": "^1.7.2",
     "sequelize": "^5.21.2",
     "sqlite3": "^4.1.0"
   },

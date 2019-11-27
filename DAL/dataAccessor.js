@@ -187,7 +187,7 @@ exports.create = function ()
   //   })
   // })
 }
-exports.models = sequelize.models
+// exports.models = sequelize.models
 
 const models = sequelize.models
 const Op = Sequelize.Op
