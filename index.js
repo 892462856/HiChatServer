@@ -2,6 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const cookieSession = require('cookie-session')
 const socket = require('./socket')
+const sc = require('./socket/common')
 const tools = require('./tools')
 
 const app = express()
@@ -132,7 +133,7 @@ routerGroup.put(function (req, res)
     .then(([group, user, users]) =>
     {
       const content = `欢迎${users.map(t => t.name).join(',')}加入群`
-      const message = socket.CreateGroupMessage('sys', user.id, group.id, content)
+      const message = sc.CreateGroupMessage(sc.MessageType.sys, user.id, group.id, content)
       setTimeout(() =>
       {
         groupMsgHandler(message)
@@ -149,7 +150,7 @@ routerGroupMember.put(function (req, res)
   dal.GroupMember.addMulti(groupId, membersId).then(users =>
   {
     const content = `欢迎${users.map(t => t.name).join(',')}加入群`
-    const message = socket.CreateGroupMessage('sys', userId, groupId, content)
+    const message = sc.CreateGroupMessage(sc.MessageType.sys, userId, groupId, content)
     setTimeout(() =>
     {
       groupMsgHandler(message)
@@ -164,7 +165,7 @@ routerGroupMember.delete(function (req, res)
   dal.GroupMember.delete(groupId, membersId).then(user =>
   {
     const content = `${users.map(t => t.name).join(',')} 被移出群`
-    const message = socket.CreateGroupMessage('sys', userId, groupId, content)
+    const message = sc.CreateGroupMessage(sc.MessageType.sys, userId, groupId, content)
     setTimeout(() =>
     {
       groupMsgHandler(message)
