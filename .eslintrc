@@ -1,0 +1,32 @@
+{
+  "parserOptions": {
+    "ecmaVersion": 6
+  },
+  "rules": {
+    "semi": [
+      "error",
+      "never"
+    ],
+    "quotes": [
+      "error",
+      "single"
+    ],
+    "no-implicit-globals": "error",
+    "brace-style": [
+      "error",
+      "allman"
+    ]
+    // "curly": [
+    //   "error",
+    //   "multi"
+    // ],
+    // "object-curly-spacing": [
+    //   "error",
+    //   "before"
+    // ],
+    // "object-curly-newline": [
+    //   "error",
+    //   "always"
+    // ]
+  }
+}

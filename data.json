@@ -1,0 +1,96 @@
+字段"时间"不管了
+------model---
+{
+	user: {
+		id,name,mobile,password,ico
+  }
+	friend: {
+		userId,friendId,isBlacked
+  }
+	group: {
+		id,name,ico,isDeleted
+  }
+	groupMember: {
+		groupId,userId,isAdmin,isOwner
+  }
+	message: {
+		id,cid,type,senderId,targetId,content,isReaded,sentTime,receiveTime
+  }
+	messageType[Enum
+  ]: {
+		id,name
+  }
+	convr[data view
+  ]: { // @时 convr不同
+		targetId,targetType(friend/group),senderId,unreadCount,latestMessage,hasCall
+  }
+}
+----action---
+register,login,modifyName,modifyMobile,modifPassword,
+getVerificationCode,查询user[mobile
+],加好友
+
+
+
+
+
+
+
+
+
+=================
+ 默认文档
+ 登录 接口
+ 注册接口
+ 用户激活
+ 获取用户好友
+ 获取用户拥有的群
+ 激活回调
+ 更改账号获取短信
+ 建群接口
+ 增加用户到群
+ 更新账号名
+ 修改密码
+ 登出接口
+ 消息实体
+ 修改用户信息
+ 用户查询
+ 上传文件
+ 添加好友
+ 禁言
+ 聊天室删除会员
+ 发红包接口
+ 抢红包
+ 修改群名称
+ 修改群用户名称
+ 获取群用户
+ app更新
+ 群信息
+ 获取群用户2
+ 解禁
+ 删除群
+ 默认文档
+ 好友备注
+ post 文件流
+ 好友静音
+ 好友取消静音
+ 群禁音
+ 注册发送短信接口
+ 获取忘记密码短信
+ 找回密码
+ 添加收藏
+ 删除收藏
+ 收藏列表
+ 获取用户详细信息（xmppUserName)
+ 上传文件接口（NEw_
+ 上传文件接口（New)
+ 获取密钥
+ 获取用户信息通过xmpp
+ 群解除禁音
+ 默认文档
+ 好友禁音
+ 退群
+ 设置黑名单密码
+ 添加黑名单
+ 移除黑名单
+ 黑名单列表
