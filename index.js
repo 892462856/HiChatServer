@@ -101,10 +101,7 @@ routerFriend.get(function (req, res, next)
 {
   const userId = req.session.userId
   const { friendId } = req.body
-  dal.Friend.get(userId, friendId).then(([friend]) =>
-  {
-    res.send(friend)
-  }).catch(next)
+  dal.Friend.get(userId, friendId).then(([friend]) => res.send(friend)).catch(next)
 })
 routerFriend.put(function (req, res, next)
 {

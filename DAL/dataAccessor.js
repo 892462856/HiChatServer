@@ -340,7 +340,7 @@ class GroupMemberOperation // extends BaseOperation
         {
           throw new Error('member existed.')
         }
-        return this.get(groupId, userId).user
+        return this.get(groupId, userId)
       })
   }
   addMulti (groupId, usersId)
@@ -360,7 +360,7 @@ class GroupMemberOperation // extends BaseOperation
       {
         this.model.destroy({ where: { groupId, userId, isOwner: false } }) // 不能删除群主
       })
-      return member.filter(m => usersId.find(u => u.id === m.userId)).map(m => m.user)
+      return member.filter(m => usersId.find(u => u.id === m.userId))
     })
   }
 }
