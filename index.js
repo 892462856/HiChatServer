@@ -85,18 +85,28 @@ app.get('/reg', (req, res, next) =>
 
 const routerUser = express.Router()
 const routerFriend = express.Router()
+const routerBlacks = express.Router()
 const routerGroup = express.Router()
 const routerGroupMember = express.Router()
 
-routerUser.get('/byMobile', function (req, res)
+routerUser.get('/byMobile', function (req, res, next)
 {
   const { mobile } = req.query
   dal.User.getByMobile(mobile).then(user =>
   {
     res.send(user)
-  })
+  }).catch(next)
 })
-routerFriend.put('/make', function (req, res)
+routerFriend.get(function (req, res, next)
+{
+  const userId = req.session.userId
+  const { friendId } = req.body
+  dal.Friend.get(userId, friendId).then(([friend]) =>
+  {
+    res.send(friend)
+  }).catch(next)
+})
+routerFriend.put(function (req, res, next)
 {
   const userId = req.session.userId
   const { friendId } = req.body
@@ -105,25 +115,31 @@ routerFriend.put('/make', function (req, res)
     res.send(friend)
   }).catch(next)
 })
-routerFriend.put(function (req, res)
+routerBlacks.delete(function (req, res, next)
 {
   const userId = req.session.userId
   const { friendId } = req.body
   dal.Friend.updateIsBlacked(userId, friendId, false).then(() =>
   {
     res.send(null)
-  })
+  }).catch(next)
 })
-routerFriend.delete(function (req, res)
+routerBlacks.put(function (req, res, next)
 {
   const userId = req.session.userId
   const { friendId } = req.body
   dal.Friend.updateIsBlacked(userId, friendId, true).then(() =>
   {
     res.send(null)
-  })
+  }).catch(next)
 })
-routerGroup.put(function (req, res)
+routerGroup.get(function (req, res, next)
+{
+  const userId = req.session.userId
+  const { groupId } = req.body
+  dal.Group.get(groupId, userId).then(group => res.send(group)).catch(next)
+})
+routerGroup.put(function (req, res, next)
 {
   const userId = req.session.userId
   const { name, membersId } = req.body
@@ -143,7 +159,7 @@ routerGroup.put(function (req, res)
     })
     .catch(next)
 })
-routerGroupMember.put(function (req, res)
+routerGroupMember.put(function (req, res, next)
 {
   const userId = req.session.userId
   const { groupId, membersId } = req.body
@@ -157,9 +173,9 @@ routerGroupMember.put(function (req, res)
     }, 1000)
 
     res.send(users)
-  })
+  }).catch(next)
 })
-routerGroupMember.delete(function (req, res)
+routerGroupMember.delete(function (req, res, next)
 {
   const { groupId, membersId } = req.body
   dal.GroupMember.delete(groupId, membersId).then(user =>
@@ -172,11 +188,12 @@ routerGroupMember.delete(function (req, res)
     }, 1000)
 
     res.send(null)
-  })
+  }).catch(next)
 })
 
 app.route('/user', routerUser)
 app.route('/friend', routerFriend)
+app.route('/blacks', routerBlacks)
 app.route('/group', routerGroup)
 app.route('/groupMember', routerGroupMember)
 app.use(function (error, req, res, next)

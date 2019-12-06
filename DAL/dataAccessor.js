@@ -254,10 +254,12 @@ class FriendOperation // extends BaseOperation
   get (userId, friendId)
   {
     return this.model.findOne({ where: { userId, friendId }, include: { model: models.User, as: 'friend' } })
+      .then(friend => friend.friend)
   }
   getList (userId)
   {
     return this.model.findAll({ where: { userId }, include: { model: models.User, as: 'friend' } })
+      .then(friends => friends.map(f => f.friend))
   }
   add (userId, friendId)
   {
@@ -268,8 +270,7 @@ class FriendOperation // extends BaseOperation
         {
           throw new tools.customError(505, 'friend existed.')
         }
-        const info = this.get(userId, friendId)
-        return info.friend
+        return this.get(userId, friendId)
       })
   }
   updateIsBlacked (userId, friendId, isBlacked)
